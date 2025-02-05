@@ -2,9 +2,6 @@
 from sqlmodel import Field, SQLModel, create_engine, Session, select
 from typing import Optional
 
-engine=create_engine("mysql+pymysql://genarodesarrollo:password@localhost:3306/fifa_male_players")
-SQLModel.metadata.create_all(engine)
-
 
 class Jugador(SQLModel, table=True):
     # Configuración de la tabla
@@ -74,13 +71,3 @@ class Jugador(SQLModel, table=True):
     goalkeeping_reflexes: Optional[int] = Field(default=None)
     goalkeeping_speed: Optional[int] = Field(default=None)
     player_traits: Optional[str] = Field(default=None)
-
-def select_players():
-    with Session(engine) as session:
-        statement=select(Jugador)
-        resultados=session.exec(statement).all()
-        return resultados
-    
-
-
-select_players()
