@@ -11,10 +11,6 @@ app = FastAPI()
 engine=create_engine("mysql+pymysql://genarodesarrollo:password@localhost:3306/fifa_male_players")
 SQLModel.metadata.create_all(engine)
 
-@app.get("/",tags=['home'])
-def read_root():
-    return {"Hello": "World"}
-
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
@@ -49,7 +45,37 @@ def jugador_especifico():
             "long_name": resultados.long_name,
             "age": resultados.age,
         }
+    
+class JugadorUpdate(SQLModel):
+    long_name: Optional[str]= None
+
 #3-Crear endpoint y pantalla que permita modificar la información de un jugado
+@app.patch("/editarJugador/{numero}")
+def editarJugador(numero: int, datos:JugadorUpdate):
+    with Session(engine) as session:
+        
+        jugador=session.get(Jugador, numero)
+
+        jugador.long_name=datos.long_name
+
+
+        session.add(jugador)
+        session.commit()
+        session.refresh(jugador)
+
+        return({"mensaje": "jugador actulizado", "jugador":jugador})
+    
+
+@app.delete("/borrarJugador/{id_jugador}")
+def borrarJugador(id_jugador: int):
+    with Session(engine) as session:
+        sentencia=select(Jugador).where(Jugador.id==id_jugador)
+        resultado=session.exec(sentencia)
+        jugadorSeleccionado=resultado.one()
+
+        session.delete(jugadorSeleccionado)
+        session.commit()
+        return {"jugador eliminado": jugadorSeleccionado}
 #4-Crear un endpoint que te permita crear un jugador,
 #5-Crear un Login para solo ver la info de forma autenticada
 
