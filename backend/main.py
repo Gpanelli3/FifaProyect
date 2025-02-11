@@ -12,16 +12,6 @@ engine=create_engine("mysql+pymysql://genarodesarrollo:password@localhost:3306/f
 SQLModel.metadata.create_all(engine)
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-
-@app.get("/productos/{id_prod}",tags=['pag2'])
-def productos(id_prod: int):
-    return{"el producto": id_prod}
-
 #1-listado de jugadores, paginado.
 @app.get("/jugadores")
 def jugadores():
@@ -31,14 +21,14 @@ def jugadores():
         return resultados
 
 #2- Crear endpoint y pantalla que devuelva los detalles de un jugador específico, dado su ID e implementar algun grafico para mostrar sus skills (Hint: pueden utilizar
-numero : int =10
-@app.get("/jugadorEspecifico")
-def jugador_especifico():
+numero : int =161587
+@app.get("/jugadorEspecifico/{id_jugador}")
+def jugador_especifico(id_jugador: int):
     with Session(engine) as session:
         statement=select(Jugador.id, 
                          Jugador.long_name,
                          Jugador.age
-                         ).where (Jugador.id==numero)
+                         ).where (Jugador.id==id_jugador)
         resultados=session.exec(statement).first()
         return {
             "id": resultados.id,
@@ -76,7 +66,25 @@ def borrarJugador(id_jugador: int):
         session.delete(jugadorSeleccionado)
         session.commit()
         return {"jugador eliminado": jugadorSeleccionado}
-#4-Crear un endpoint que te permita crear un jugador,
+    
+class DatosJugador(SQLModel):
+    long_name: str
+    club_name: str
+    age: int
+
+
+#4-Crear un endpoint que te permita crear un jugador
+@app.post("/crearJugador")
+def crearJugador(datos: DatosJugador):
+    with Session(engine) as session:
+
+        jugador = Jugador(**datos.dict())
+        session.add(jugador)
+        session.commit()
+        session.refresh(jugador)
+
+        return {"Jugador creado": jugador}
+
 #5-Crear un Login para solo ver la info de forma autenticada
 
         
