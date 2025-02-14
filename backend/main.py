@@ -20,7 +20,7 @@ def jugadores():
         resultados=session.exec(consulta).all()
         return resultados
 
-#2- Crear endpoint y pantalla que devuelva los detalles de un jugador específico, dado su ID e implementar algun grafico para mostrar sus skills (Hint: pueden utilizar
+#2- Crear endpoint y pantalla que devuelva los detalles de un jugador específico
 numero : int =161587
 @app.get("/jugadorEspecifico/{id_jugador}")
 def jugador_especifico(id_jugador: int):
@@ -66,8 +66,10 @@ def borrarJugador(id_jugador: int):
         session.delete(jugadorSeleccionado)
         session.commit()
         return {"jugador eliminado": jugadorSeleccionado}
+
+
     
-class DatosJugador(SQLModel):
+class CrearJugador(SQLModel):
     long_name: str
     club_name: str
     age: int
@@ -75,7 +77,7 @@ class DatosJugador(SQLModel):
 
 #4-Crear un endpoint que te permita crear un jugador
 @app.post("/crearJugador")
-def crearJugador(datos: DatosJugador):
+def crearJugador(datos: CrearJugador):
     with Session(engine) as session:
 
         jugador = Jugador(**datos.dict())
@@ -85,6 +87,5 @@ def crearJugador(datos: DatosJugador):
 
         return {"Jugador creado": jugador}
 
-#5-Crear un Login para solo ver la info de forma autenticada
 
         
